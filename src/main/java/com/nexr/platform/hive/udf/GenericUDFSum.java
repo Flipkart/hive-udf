@@ -32,11 +32,11 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorConverters.Converter;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorUtils.ObjectInspectorCopyOption;
-import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hive.pdk.HivePdkUnitTest;
 import org.apache.hive.pdk.HivePdkUnitTests;
 
+import static com.nexr.platform.hive.udf.common.Utils.validateAndGetWritableNumericType;
 
 @Description(name = "sum",
     value = "_FUNC_(hash_key, order_by_col1, order_by_col2 ...) " +
@@ -94,22 +94,9 @@ public class GenericUDFSum extends GenericUDF {
 		}
 
 		String t = arguments[1].getTypeName();
-		if (t.equals(Constants.TINYINT_TYPE_NAME)||
-				t.equals(Constants.SMALLINT_TYPE_NAME)||
-				t.equals(Constants.INT_TYPE_NAME)||
-				t.equals(Constants.BIGINT_TYPE_NAME)) {
-			resultOI = PrimitiveObjectInspectorFactory.writableLongObjectInspector;
-		} else if (t.equals(Constants.FLOAT_TYPE_NAME)||
-				t.equals(Constants.DOUBLE_TYPE_NAME)||
-				t.equals(Constants.STRING_TYPE_NAME)) {
-			resultOI = PrimitiveObjectInspectorFactory.writableDoubleObjectInspector;
-		} else{ 
-			throw new UDFArgumentTypeException(1,
-					"Only numeric or string type arguments are accepted but "
-					+ arguments[1].getTypeName() + " is passed.");
-		}
+    resultOI = validateAndGetWritableNumericType(t);
 
-		longResult.set(0);
+    longResult.set(0);
 		doubleResult.set(0);
 		hashOI = arguments[0];
 		valueOI = arguments[1];
@@ -117,7 +104,7 @@ public class GenericUDFSum extends GenericUDF {
 		return resultOI;
 	}
 
-	@Override
+  @Override
 	public Object evaluate(DeferredObject[] arguments) throws HiveException {
 		Object hash = arguments[0].get();
 		Object value = arguments[1].get();

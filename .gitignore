@@ -7,3 +7,5 @@ logs
 javadocs
 build
 dist
+.idea/
+*.iml

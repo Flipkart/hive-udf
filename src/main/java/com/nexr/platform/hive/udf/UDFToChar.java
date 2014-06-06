@@ -74,7 +74,7 @@ import org.apache.hive.pdk.HivePdkUnitTests;
 			@HivePdkUnitTest(query = "SELECT nexr_to_char(1210.73,'9999.9') FROM datatypes;",result = "1210.7"),
 			@HivePdkUnitTest(query = "SELECT nexr_to_char(1210.73,'9,999.99') FROM datatypes;",result = "1,210.73"),
 			@HivePdkUnitTest(query = "SELECT nexr_to_char(1210,'$9999') FROM datatypes;",result = "$1210"),
-			@HivePdkUnitTest(query = "SELECT nexr_to_char('test') FROM onerow;",result = "test")
+			@HivePdkUnitTest(query = "SELECT nexr_to_char('testCumulativeSumForSequenceOfSameGroupNumbers') FROM onerow;",result = "testCumulativeSumForSequenceOfSameGroupNumbers")
 		}
 	)
 
