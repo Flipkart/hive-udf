@@ -2,6 +2,7 @@ package com.nexr.platform.hive.udf;
 
 import com.nexr.platform.hive.udf.banding.SimpleBanding;
 import com.nexr.platform.hive.udf.common.Utils;
+import com.sun.tools.javac.util.Pair;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.UDFType;
@@ -34,9 +35,7 @@ public class GenericUDFSumRangeBucketing extends GenericUDF
   private ObjectInspector totSumOI;
   private PrimitiveObjectInspector valueInspector;
   private StandardMapObjectInspector mapInspector;
-
   private Text resultKeyText = new Text();
-
   private WritableStringObjectInspector resultInspector;
 
   @Override
@@ -75,16 +74,19 @@ public class GenericUDFSumRangeBucketing extends GenericUDF
   @Override
   public Object evaluate(DeferredObject[] arguments) throws HiveException
   {
+    String band = getBandAndCumSum(arguments).fst;
+    resultKeyText.set(band);
+    return resultKeyText;
+  }
+
+  Pair<String, Number> getBandAndCumSum(DeferredObject[] arguments) throws HiveException
+  {
     Object totSumValueArg = arguments[2].get();
     Object bandConfMapArg = arguments[3].get();
 
     Object writableCumulativeSum = genericUDFSum.evaluate(Arrays.copyOfRange(arguments, 0, 2));
     Map<Text, Text> bandConfMapRaw = (Map<Text, Text>) mapInspector.getMap(bandConfMapArg);
-    Map<String, String> bandConfMap = new HashMap<String, String>();
-    for (Map.Entry<Text, Text> textTextEntry : bandConfMapRaw.entrySet())
-    {
-      bandConfMap.put(textTextEntry.getKey().toString(), textTextEntry.getValue().toString());
-    }
+    Map<String, String> bandConfMap = getStringStringMap(bandConfMapRaw);
 
     String band = null;
     Number cumulativeSum = null;
@@ -103,9 +105,17 @@ public class GenericUDFSumRangeBucketing extends GenericUDF
       cumulativeSum = ((LongWritable) writableCumulativeSum).get();
       band = bandingLogic.getBand(cumulativeSum, totSumVal, bandConfMap);
     }
+    return new Pair<String, Number>(band, cumulativeSum);
+  }
 
-    resultKeyText.set(band);
-    return resultKeyText;
+  private Map<String, String> getStringStringMap(Map<Text, Text> bandConfMapRaw)
+  {
+    Map<String, String> bandConfMap = new HashMap<String, String>();
+    for (Map.Entry<Text, Text> textTextEntry : bandConfMapRaw.entrySet())
+    {
+      bandConfMap.put(textTextEntry.getKey().toString(), textTextEntry.getValue().toString());
+    }
+    return bandConfMap;
   }
 
   @Override
