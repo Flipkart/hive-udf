@@ -27,8 +27,8 @@ import static org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
  */
 public class GenericUDFSumRangeBucketingTest
 {
+  private int mismatchCount;
   private GenericUDFSumRangeBucketing udfSumRangeBucketing;
-  private int count;
 
   @Before
   public void setup() throws UDFArgumentException
@@ -79,7 +79,7 @@ public class GenericUDFSumRangeBucketingTest
         assertRespWithoutCumSum(1, qty, integerStringPair.snd, totSum);
       }
     }
-    System.out.println("Tot mismatch " + count);
+    System.out.println("Tot mismatch " + mismatchCount);
 
   }
 
@@ -97,7 +97,7 @@ public class GenericUDFSumRangeBucketingTest
     }
     catch (AssertionError e)
     {
-      count++;
+      mismatchCount++;
       System.err.println(
         "hash " + hash + " value " + value + " totsum " + totSum + " cumSum " + cumSum + "  " +
           "perc " + cumSum.longValue() * 100.0 / totSum + "errorMsg " +

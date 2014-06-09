@@ -21,15 +21,12 @@ public class SimpleBanding extends Banding
 
     for (Map.Entry<String, Range> rangeEntry : percentageRangeMap.entrySet())
     {
-
       if (rangeEntry.getValue().containsDouble(currentContrPercentage))
       {
         band = rangeEntry.getKey();
         break;
       }
     }
-
-//    System.out.println("perc: " + currentContrPercentage + " band " + band + " map "+ percentageRangeMap);
     return band;
   }
 }
