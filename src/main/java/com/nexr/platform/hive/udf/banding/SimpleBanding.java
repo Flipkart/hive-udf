@@ -10,7 +10,7 @@ import java.util.Map;
 public class SimpleBanding extends Banding
 {
 
-  public static final String NOBAND = "band0";
+  public static final String NOBAND = "NOBAND";
 
   @Override
   public String getBand(Number currentVal, Number totSum, Map<String, String> bandDefMap)
