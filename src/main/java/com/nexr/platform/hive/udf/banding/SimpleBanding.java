@@ -29,7 +29,7 @@ public class SimpleBanding extends Banding
       }
     }
 
-    System.out.println("perc: " + currentContrPercentage + " band " + band + " map "+ percentageRangeMap);
+//    System.out.println("perc: " + currentContrPercentage + " band " + band + " map "+ percentageRangeMap);
     return band;
   }
 }

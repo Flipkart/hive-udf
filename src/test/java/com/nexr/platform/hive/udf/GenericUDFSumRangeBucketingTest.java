@@ -1,5 +1,6 @@
 package com.nexr.platform.hive.udf;
 
+import com.sun.tools.javac.util.Pair;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
@@ -11,8 +12,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * User: kaushik Date: 06/06/14 Time: 1:11 PM
@@ -37,112 +42,40 @@ public class GenericUDFSumRangeBucketingTest
   }
 
   @Test
-  public void test() throws HiveException
+  public void testBand() throws HiveException
   {
 
-    assertResp(1, 12, "band5", 100, 12l);
-    assertResp(1, 10, "band4", 100, 22l);
+    assertResp(1, 12, "Band5", 100, 12l);
+    assertResp(1, 10, "Band4", 100, 22l);
   }
 
   @Test
-  public void test2() throws HiveException
+  public void testBandFromInputFile() throws FileNotFoundException, HiveException
   {
-    assertRespWithoutCumSum(1, 101, "band5", 1078);
-    assertRespWithoutCumSum(1, 64, "band5", 1078);
-    assertRespWithoutCumSum(1, 61, "band4", 1078);
-    assertRespWithoutCumSum(1, 49, "band4", 1078);
-    assertRespWithoutCumSum(1, 46, "band4", 1078);
-    assertRespWithoutCumSum(1, 40, "band4", 1078);
-    assertRespWithoutCumSum(1, 38, "band4", 1078);
-    assertRespWithoutCumSum(1, 34, "band3", 1078);
-    assertRespWithoutCumSum(1, 32, "band3", 1078);
-    assertRespWithoutCumSum(1, 31, "band3", 1078);
-    assertRespWithoutCumSum(1, 29, "band3", 1078);
-    assertRespWithoutCumSum(1, 26, "band3", 1078);
-    assertRespWithoutCumSum(1, 26, "band3", 1078);
-    assertRespWithoutCumSum(1, 24, "band3", 1078);
-    assertRespWithoutCumSum(1, 22, "band3", 1078);
-    assertRespWithoutCumSum(1, 20, "band2", 1078);
-    assertRespWithoutCumSum(1, 20, "band2", 1078);
-    assertRespWithoutCumSum(1, 20, "band3", 1078);
-    assertRespWithoutCumSum(1, 19, "band2", 1078);
-    assertRespWithoutCumSum(1, 19, "band2", 1078);
-    assertRespWithoutCumSum(1, 17, "band2", 1078);
-    assertRespWithoutCumSum(1, 16, "band2", 1078);
-    assertRespWithoutCumSum(1, 15, "band2", 1078);
-    assertRespWithoutCumSum(1, 14, "band2", 1078);
-    assertRespWithoutCumSum(1, 14, "band2", 1078);
-    assertRespWithoutCumSum(1, 14, "band2", 1078);
-    assertRespWithoutCumSum(1, 12, "band2", 1078);
-    assertRespWithoutCumSum(1, 12, "band2", 1078);
-    assertRespWithoutCumSum(1, 11, "band1", 1078);
-    assertRespWithoutCumSum(1, 11, "band2", 1078);
-    assertRespWithoutCumSum(1, 11, "band2", 1078);
-    assertRespWithoutCumSum(1, 10, "band1", 1078);
-    assertRespWithoutCumSum(1, 9, "band1", 1078);
-    assertRespWithoutCumSum(1, 9, "band1", 1078);
-    assertRespWithoutCumSum(1, 8, "band1", 1078);
-    assertRespWithoutCumSum(1, 8, "band1", 1078);
-    assertRespWithoutCumSum(1, 8, "band1", 1078);
-    assertRespWithoutCumSum(1, 7, "band1", 1078);
-    assertRespWithoutCumSum(1, 7, "band1", 1078);
-    assertRespWithoutCumSum(1, 7, "band1", 1078);
-    assertRespWithoutCumSum(1, 7, "band1", 1078);
-    assertRespWithoutCumSum(1, 6, "band1", 1078);
-    assertRespWithoutCumSum(1, 6, "band1", 1078);
-    assertRespWithoutCumSum(1, 5, "band1", 1078);
-    assertRespWithoutCumSum(1, 5, "band1", 1078);
-    assertRespWithoutCumSum(1, 5, "band1", 1078);
-    assertRespWithoutCumSum(1, 5, "band1", 1078);
-    assertRespWithoutCumSum(1, 5, "band1", 1078);
-    assertRespWithoutCumSum(1, 5, "band1", 1078);
-    assertRespWithoutCumSum(1, 4, "band1", 1078);
-    assertRespWithoutCumSum(1, 4, "band1", 1078);
-    assertRespWithoutCumSum(1, 4, "band1", 1078);
-    assertRespWithoutCumSum(1, 4, "band1", 1078);
-    assertRespWithoutCumSum(1, 4, "band1", 1078);
-    assertRespWithoutCumSum(1, 4, "band1", 1078);
-    assertRespWithoutCumSum(1, 3, "band1", 1078);
-    assertRespWithoutCumSum(1, 3, "band1", 1078);
-    assertRespWithoutCumSum(1, 3, "band1", 1078);
-    assertRespWithoutCumSum(1, 3, "band1", 1078);
-    assertRespWithoutCumSum(1, 3, "band1", 1078);
-    assertRespWithoutCumSum(1, 3, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 2, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
-    assertRespWithoutCumSum(1, 1, "band1", 1078);
+    FileInputStream inputStream = new FileInputStream("/tmp/banding_data.csv");
+    Scanner scanner = new Scanner(inputStream);
+    ArrayList<Pair<Integer, String>> pairList = new ArrayList<Pair<Integer, String>>();
+    int totSum = 0;
+
+    while (scanner.hasNext())
+    {
+      String row = scanner.next();
+      String[] rowSplit = row.split(",");
+      int qty = Integer.parseInt(rowSplit[1].trim());
+      String bandExpected = rowSplit[2].trim();
+      totSum += qty;
+
+      pairList.add(new Pair<Integer, String>(qty, bandExpected));
+    }
+
+    for (Pair<Integer, String> integerStringPair : pairList)
+    {
+      Integer qty = integerStringPair.fst;
+      if(qty > 0)
+      {
+        assertRespWithoutCumSum(1, qty, integerStringPair.snd, totSum);
+      }
+    }
   }
 
   private void assertRespWithoutCumSum(int hash, int value, String expectedBand, int totSum) throws
@@ -161,14 +94,13 @@ public class GenericUDFSumRangeBucketingTest
         "hash " + hash + " value " + value + " totsum " + totSum +
           " expected: " + expectedBand + " actual: " + res);
     }
-    System.out.println("mismatch: " + count);
   }
 
   private void assertResp(int hash, int value, String expectedBand, int totSum,
                           long expectedCumSum) throws HiveException
   {
     Map<String, Number> res = getBandForSampleParams(hash, value, totSum);
-    Assert.assertTrue(res.containsKey(expectedBand));
+    Assert.assertTrue(res.toString(),res.containsKey(expectedBand));
     Assert.assertEquals(expectedCumSum, res.get(expectedBand));
   }
 
@@ -180,11 +112,11 @@ public class GenericUDFSumRangeBucketingTest
     {
       {
         {
-          put("band5", "0-20");
-          put("band4", "20-40");
-          put("band3", "40-60");
-          put("band2", "60-80");
-          put("band1", "80-100");
+          put("Band5", "0-20");
+          put("Band4", "20-40");
+          put("Band3", "40-60");
+          put("Band2", "60-80");
+          put("Band1", "80-100");
         }
       }
     };
