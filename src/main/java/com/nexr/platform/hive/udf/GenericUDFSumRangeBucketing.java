@@ -1,6 +1,7 @@
 package com.nexr.platform.hive.udf;
 
-import com.nexr.platform.hive.udf.banding.SimpleBanding;
+import com.nexr.platform.hive.udf.banding.AnalyticsBanding;
+import com.nexr.platform.hive.udf.banding.Banding;
 import com.nexr.platform.hive.udf.common.Utils;
 import com.sun.tools.javac.util.Pair;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -30,7 +31,7 @@ import static com.nexr.platform.hive.udf.common.Utils.validateAndGetWritableNume
 @UDFType(deterministic = false, stateful = true)
 public class GenericUDFSumRangeBucketing extends GenericUDF
 {
-  private SimpleBanding bandingLogic;
+  private Banding bandingLogic;
   private GenericUDFSum genericUDFSum;
   private ObjectInspector totSumOI;
   private PrimitiveObjectInspector valueInspector;
@@ -61,7 +62,7 @@ public class GenericUDFSumRangeBucketing extends GenericUDF
       .getMapValueObjectInspector() instanceof StringObjectInspector))
       throw new UDFArgumentException("key/val of Map should both be strings");
 
-    bandingLogic = new SimpleBanding();
+    bandingLogic = new AnalyticsBanding();
 
     return resultInspector;
   }
