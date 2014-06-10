@@ -29,7 +29,7 @@ public class AnalyticsBanding extends Banding
       {
         band = rangeEntry.getKey();
         band = bandAfterShifting(band);
-        if (band!= NOBAND && !bandOccupation.containsKey(band))
+        if (band != NOBAND && !bandOccupation.containsKey(band))
           bandOccupation.put(band, true);
         break;
       }

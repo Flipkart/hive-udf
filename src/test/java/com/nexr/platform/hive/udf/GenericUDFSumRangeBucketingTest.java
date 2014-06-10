@@ -1,6 +1,7 @@
 package com.nexr.platform.hive.udf;
 
 import com.sun.tools.javac.util.Pair;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
@@ -14,11 +15,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.*;
 
 import static org.apache.hadoop.hive.ql.udf.generic.GenericUDF.DeferredObject;
 
@@ -53,10 +53,11 @@ public class GenericUDFSumRangeBucketingTest
   }
 
   @Test
-  public void testBandFromInputFile() throws FileNotFoundException, HiveException
+  public void testBandFromInputFile() throws IOException, HiveException
   {
-    FileInputStream inputStream = new FileInputStream("/tmp/banding_data.csv");
+    FileInputStream inputStream = new FileInputStream("/tmp/sales_band_with_b0.csv");
     Scanner scanner = new Scanner(inputStream);
+    List<List<Object>> debugData = new ArrayList<List<Object>>();
     ArrayList<Pair<Integer, String>> pairList = new ArrayList<Pair<Integer, String>>();
     int totSum = 0;
 
@@ -76,32 +77,52 @@ public class GenericUDFSumRangeBucketingTest
       Integer qty = integerStringPair.fst;
       if (qty > 0)
       {
-        assertRespWithoutCumSum(1, qty, integerStringPair.snd, totSum);
+        assertRespWithoutCumSum(1, qty, integerStringPair.snd, totSum, debugData);
       }
     }
     System.out.println("Tot mismatch " + mismatchCount);
 
+    writeDebug(debugData);
   }
 
-  private void assertRespWithoutCumSum(int hash, int value, String expectedBand, int totSum) throws
+  private void writeDebug(List<List<Object>> debugData) throws IOException
+  {
+    FileWriter fileWriter = new FileWriter("/tmp/debug_banding.csv");
+    fileWriter.write("Quantity,TotalSum,CumulativeSum,Cumulative%Contribution,Band,MismatchErrorExplanation" + "\n");
+    for (List<Object> objects : debugData)
+    {
+      fileWriter.write(StringUtils.join(objects, ",") + "\n");
+    }
+    fileWriter.close();
+  }
+
+  private void assertRespWithoutCumSum(int hash, int value, String expectedBand, int totSum,
+                                       List<List<Object>> debugData) throws
     HiveException
   {
     Number cumSum = 0;
+    String actualBand = null;
+    String percentage = null;
+    DecimalFormat df = new DecimalFormat("#.##");
+
     try
     {
       DeferredObject[] arguments = getSampleParams(hash, value, totSum);
       Pair<String, Number> resp = udfSumRangeBucketing.getBandAndCumSum(arguments);
       cumSum = resp.snd;
-      String actualBand = resp.fst;
+      actualBand = resp.fst;
+      percentage = df.format(cumSum.doubleValue() * 100.0 / totSum);
       Assert.assertEquals(expectedBand, actualBand);
+
+      debugData
+        .add(new ArrayList<Object>(Arrays.asList(value, totSum, cumSum, percentage, actualBand)));
     }
     catch (AssertionError e)
     {
       mismatchCount++;
-      System.err.println(
-        "hash " + hash + " value " + value + " totsum " + totSum + " cumSum " + cumSum + "  " +
-          "perc " + cumSum.longValue() * 100.0 / totSum + "errorMsg " +
-          e.getMessage());
+      debugData.add(
+        new ArrayList<Object>(
+          Arrays.asList(value, totSum, cumSum, percentage, actualBand, e.getMessage())));
     }
   }
 
