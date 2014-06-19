@@ -3,8 +3,8 @@ package com.nexr.platform.hive.udf;
 import com.nexr.platform.hive.udf.banding.AnalyticsBanding;
 import com.nexr.platform.hive.udf.banding.Banding;
 import com.nexr.platform.hive.udf.common.Utils;
-import com.sun.tools.javac.util.Pair;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.UDFType;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
@@ -75,12 +75,12 @@ public class GenericUDFSumRangeBucketing extends GenericUDF
   @Override
   public Object evaluate(DeferredObject[] arguments) throws HiveException
   {
-    String band = getBandAndCumSum(arguments).fst;
+    String band = getBandAndCumSum(arguments).getOne();
     resultKeyText.set(band);
     return resultKeyText;
   }
 
-  Pair<String, Number> getBandAndCumSum(DeferredObject[] arguments) throws HiveException
+  Utilities.Tuple<String, Number> getBandAndCumSum(DeferredObject[] arguments) throws HiveException
   {
     Object totSumValueArg = arguments[2].get();
     Object bandConfMapArg = arguments[3].get();
@@ -106,7 +106,7 @@ public class GenericUDFSumRangeBucketing extends GenericUDF
       cumulativeSum = ((LongWritable) writableCumulativeSum).get();
       band = bandingLogic.getBand(cumulativeSum, totSumVal, bandConfMap);
     }
-    return new Pair<String, Number>(band, cumulativeSum);
+    return new Utilities.Tuple<String, Number>(band, cumulativeSum);
   }
 
   private Map<String, String> getStringStringMap(Map<Text, Text> bandConfMapRaw)

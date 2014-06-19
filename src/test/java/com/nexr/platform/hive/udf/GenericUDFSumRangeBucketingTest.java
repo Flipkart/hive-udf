@@ -3,6 +3,7 @@ package com.nexr.platform.hive.udf;
 import com.sun.tools.javac.util.Pair;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
 import org.apache.hadoop.hive.serde2.lazybinary.objectinspector.LazyBinaryMapObjectInspector;
@@ -12,6 +13,7 @@ import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectIn
 import org.apache.hadoop.io.Text;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileInputStream;
@@ -52,6 +54,17 @@ public class GenericUDFSumRangeBucketingTest
     assertResp(1, 10, "Band4", 100);
   }
 
+  
+  @Test
+  public void test2() throws HiveException
+  {
+    assertResp(1,50,"Band5", 100);
+    assertResp(1,30,"Band4", 100);
+    assertResp(1,15,"Band3", 100);
+    assertResp(1,5,"Band2", 100);
+  }
+
+  @Ignore
   @Test
   public void testBandFromInputFile() throws IOException, HiveException
   {
@@ -108,9 +121,9 @@ public class GenericUDFSumRangeBucketingTest
     try
     {
       DeferredObject[] arguments = getSampleParams(hash, value, totSum);
-      Pair<String, Number> resp = udfSumRangeBucketing.getBandAndCumSum(arguments);
-      cumSum = resp.snd;
-      actualBand = resp.fst;
+      Utilities.Tuple<String, Number> resp = udfSumRangeBucketing.getBandAndCumSum(arguments);
+      cumSum = resp.getTwo();
+      actualBand = resp.getOne();
       percentage = df.format(cumSum.doubleValue() * 100.0 / totSum);
       Assert.assertEquals(expectedBand, actualBand);
 
