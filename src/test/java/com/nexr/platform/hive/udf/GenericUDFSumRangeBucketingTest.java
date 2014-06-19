@@ -1,6 +1,5 @@
 package com.nexr.platform.hive.udf;
 
-import com.sun.tools.javac.util.Pair;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.exec.Utilities;
@@ -54,14 +53,13 @@ public class GenericUDFSumRangeBucketingTest
     assertResp(1, 10, "Band4", 100);
   }
 
-  
   @Test
   public void test2() throws HiveException
   {
-    assertResp(1,50,"Band5", 100);
-    assertResp(1,30,"Band4", 100);
-    assertResp(1,15,"Band3", 100);
-    assertResp(1,5,"Band2", 100);
+    assertResp(1, 50, "Band5", 100);
+    assertResp(1, 30, "Band4", 100);
+    assertResp(1, 15, "Band3", 100);
+    assertResp(1, 5, "Band2", 100);
   }
 
   @Ignore
@@ -71,7 +69,8 @@ public class GenericUDFSumRangeBucketingTest
     FileInputStream inputStream = new FileInputStream("/tmp/sales_band_with_b0.csv");
     Scanner scanner = new Scanner(inputStream);
     List<List<Object>> debugData = new ArrayList<List<Object>>();
-    ArrayList<Pair<Integer, String>> pairList = new ArrayList<Pair<Integer, String>>();
+    ArrayList<Utilities.Tuple<Integer, String>> pairList =
+      new ArrayList<Utilities.Tuple<Integer, String>>();
     int totSum = 0;
 
     while (scanner.hasNext())
@@ -82,15 +81,15 @@ public class GenericUDFSumRangeBucketingTest
       String bandExpected = rowSplit[2].trim();
       totSum += qty;
 
-      pairList.add(new Pair<Integer, String>(qty, bandExpected));
+      pairList.add(new Utilities.Tuple<Integer, String>(qty, bandExpected));
     }
 
-    for (Pair<Integer, String> integerStringPair : pairList)
+    for (Utilities.Tuple<Integer, String> integerStringPair : pairList)
     {
-      Integer qty = integerStringPair.fst;
+      Integer qty = integerStringPair.getOne();
       if (qty > 0)
       {
-        assertRespWithoutCumSum(1, qty, integerStringPair.snd, totSum, debugData);
+        assertRespWithoutCumSum(1, qty, integerStringPair.getTwo(), totSum, debugData);
       }
     }
     System.out.println("Tot mismatch " + mismatchCount);
@@ -101,7 +100,9 @@ public class GenericUDFSumRangeBucketingTest
   private void writeDebug(List<List<Object>> debugData) throws IOException
   {
     FileWriter fileWriter = new FileWriter("/tmp/debug_banding.csv");
-    fileWriter.write("Quantity,TotalSum,CumulativeSum,Cumulative%Contribution,Band,MismatchErrorExplanation" + "\n");
+    fileWriter.write(
+      "Quantity,TotalSum,CumulativeSum,Cumulative%Contribution,Band,MismatchErrorExplanation" +
+        "\n");
     for (List<Object> objects : debugData)
     {
       fileWriter.write(StringUtils.join(objects, ",") + "\n");
