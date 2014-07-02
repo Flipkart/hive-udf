@@ -122,7 +122,8 @@ public class GenericUDFSumRangeBucketingTest
     try
     {
       DeferredObject[] arguments = getSampleParams(hash, value, totSum);
-      Utilities.Tuple<String, Number> resp = udfSumRangeBucketing.getBandAndCumSum(arguments);
+      GenericUDFSumRangeBucketing.Tuple<String, Number>
+        resp = udfSumRangeBucketing.getBandAndCumSum(arguments);
       cumSum = resp.getTwo();
       actualBand = resp.getOne();
       percentage = df.format(cumSum.doubleValue() * 100.0 / totSum);
